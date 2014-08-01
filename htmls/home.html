@@ -1,0 +1,35 @@
+
+<center>
+
+Nombre: <input type='text' value='' id='nombre'>
+Teléfono: <input type='text' value='' id='tel'>
+<input type='button' value='agregar' onclick='agregar();' />
+
+</center>
+
+
+<table id='tabla'>
+
+</table>
+
+<script>
+function agregar() {
+
+	   var strNombre = $('#nombre').val();
+	   var strTelefono = $('#tel').val();
+	  
+       $.post('/ajax/agregar',{tel:strTelefono}, 
+	         function(respuesta) {
+	            $('#tabla').html( respuesta );
+	    	}
+	   );
+      
+}
+
+function sleep(millis, callback) {
+    setTimeout(function()
+            { callback(); }
+    , millis);
+}
+
+</script>

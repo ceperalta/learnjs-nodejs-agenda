@@ -1,0 +1,16 @@
+<br><br><br><center><div id='contactos'></div></center>
+
+  
+<script>
+	$( document ).ready(
+	  
+		function() {
+		       $.post('/ajax/tomarcontactos', 
+			         function( data ) {
+			            $('#contactos').html( data );
+			    	}
+			   );
+		  }
+
+	);
+</script>
