@@ -5,12 +5,14 @@ Nombre: <input type='text' value='' id='nombre'>
 Teléfono: <input type='text' value='' id='tel'>
 <input type='button' value='agregar' onclick='agregar();' />
 
-</center>
+<br/><br/>
 
-
-<table id='tabla'>
+<table id='tabla' border=1>
+	<tr><th>acción</th><th>Nombre</th><th>Teléfono</th></tr>
 
 </table>
+
+</center>
 
 <script>
 function agregar() {
@@ -18,7 +20,7 @@ function agregar() {
 	   var strNombre = $('#nombre').val();
 	   var strTelefono = $('#tel').val();
 	  
-       $.post('/ajax/agregar',{tel:strTelefono}, 
+       $.post('/ajax/agregar',{nombre:strNombre,tel:strTelefono}, 
 	         function(respuesta) {
 	            $('#tabla').html( respuesta );
 	    	}

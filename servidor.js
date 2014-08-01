@@ -111,7 +111,31 @@ function agregar()
     processPost(reqGlobal, resGlobal, function() {
         //console.log("tel: " + reqGlobal.post.tel);
 
-        var htmlRes = "agregando" + reqGlobal.post.tel;
+        var htmlRes = "nombre: " + reqGlobal.post.nombre;
+        htmlRes += "<br>tel: " + reqGlobal.post.tel;
+
+        var strIdUnico = Math.floor((1 + Math.random()) * 0x10000).toString(16);
+
+        var strLeidoBD = fs.readFileSync("/nodejs/servidor/bd/bd.txt", "utf8");
+        var objJSONBD = JSON.parse(strLeidoBD);
+
+        //var objJSONBD = {};
+        objJSONBD.contacto2 = {};
+        objJSONBD.contacto2.elid = strIdUnico;
+        objJSONBD.contacto2.nombre = reqGlobal.post.nombre;
+        objJSONBD.contacto2.tel = reqGlobal.post.tel;
+
+        console.log(objJSONBD);
+
+        var strObjJSONBD = JSON.stringify(objJSONBD);
+
+        fs.writeFile("/nodejs/servidor/bd/bd.txt", strObjJSONBD, function(err) {
+            if(err) {
+                  console.log(err);
+              } else {
+                  //console.log("bd.txt actualizado...");
+              }
+        }); 
     
         resGlobal.write(htmlRes);
         resGlobal.end();        
