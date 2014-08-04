@@ -7,10 +7,10 @@ Teléfono: <input type='text' value='' id='tel'>
 
 <br/><br/>
 
-<table id='tabla' border=1>
-	
-
-</table>
+<div id='div_tabla_mod'>
+	<table id='tabla' border=1>
+	</table>
+</div>
 
 </center>
 
@@ -49,12 +49,51 @@ function eliminar(strID){
 
 }
 
+function modificar(strID){
+	$.post('/ajax/tomarContacto',{strIDPar:strID}, 
+	         function(strRespuestaJSON) {
+	         	var objJSON = JSON.parse(strRespuestaJSON);
+
+	         	var strHTML = "<input type='hidden' id='elid' value='"+objJSON.elid+"'>Nombre: <input type='text' value='"+objJSON.nombre+"' id='nombreAMod'><br>Teléfono: <input type='text' value='"+objJSON.tel+"' id='telAMod'><br><input type='button' value='cancelar' onclick='cancelarMod();'><input type='button' value='modificar' onclick='modificarABD();'>";
+
+	         	$('#div_tabla_mod').html(strHTML);
+	           
+	    	}
+	   );
+}
+
+function modificarABD(){
+   var strElID= $('#elid').val();
+   var strNombre = $('#nombreAMod').val();
+   var strTelefono = $('#telAMod').val();
+  
+   $.post('/ajax/modificarABD',{nombre:strNombre,tel:strTelefono,strID:strElID}, 
+         function(strRespuestaJSON) {
+         	var objJSON = JSON.parse(strRespuestaJSON);
+            var strConTabla = "<table id='tabla' border=1>"+armaTablaDesdeJSON(objJSON)+"</table>";
+	        $('#div_tabla_mod').html( strConTabla );
+    	}
+   );
+}
+
+function cancelarMod(){
+	 $.post('/ajax/tomarListaTels','', 
+	         function(strRespuestaJSON) {
+	         	 var objJSON = JSON.parse(strRespuestaJSON);
+
+	         	 var strConTabla = "<table id='tabla' border=1>"+armaTablaDesdeJSON(objJSON)+"</table>";
+
+	             $('#div_tabla_mod').html( strConTabla );
+	    	}
+      	);
+
+}
 
 function armaTablaDesdeJSON(objJSON){
 	var strHTML = "<tr><th>acción</th><th>Nombre</th><th>Teléfono</th></tr>";
  	for(i=0; i<objJSON.contactos.length; i++){
     	  strHTML += '<tr>';
-	      strHTML += "<td><a href='javascript:eliminar(\"" + objJSON.contactos[i].elid + "\");'>eliminar</a></td>";
+	      strHTML += "<td><a href='javascript:modificar(\"" + objJSON.contactos[i].elid + "\");'>modificar</a> | <a href='javascript:eliminar(\"" + objJSON.contactos[i].elid + "\");'>eliminar</a></td>";
 	      strHTML += "<td>" + objJSON.contactos[i].nombre + "</td>";
 	      strHTML += "<td>" + objJSON.contactos[i].tel + "</td>";
 	      strHTML += '</tr>';

@@ -52,6 +52,16 @@ http.createServer(
          if(aPUrl[2]=="tomarListaTels"){
           tomarListaTels();     
         }
+        if(aPUrl[2]=="tomarContacto"){
+          tomarContacto();     
+        }
+        if(aPUrl[2]=="modificarABD"){
+          modificarABD();     
+        }
+
+        
+
+        
       }
                 
      
@@ -107,6 +117,38 @@ function entregarDatos()
 
 
 // ********************** AJAX ***********************************
+
+function  modificarABD(){
+     processPost(reqGlobal, resGlobal, function() {
+        var strLeidoBD = fs.readFileSync(BD_TXT, "utf8");
+        var objJSONBD = JSON.parse(strLeidoBD);
+
+        for(i=0; i<objJSONBD.contactos.length; i++){
+            if(objJSONBD.contactos[i].elid ===  reqGlobal.post.strID){
+                objJSONBD.contactos[i].tel = reqGlobal.post.tel;
+                objJSONBD.contactos[i].nombre = reqGlobal.post.nombre; //reqGlobal.post.nombre;
+                break;
+            }
+        }
+
+        var strJSON = JSON.stringify(objJSONBD);
+
+        fs.writeFile(BD_TXT, strJSON, function(err) {
+            if(err) {
+                  console.log(err);
+              } else {
+                  //console.log("bd.txt actualizado...");
+              }
+        });
+
+
+         resGlobal.writeHead(200, {'Content-Type': 'text/html'});
+         resGlobal.write(strJSON);
+         resGlobal.end();  
+
+
+     });
+}
 
 function eliminar(){
     processPost(reqGlobal, resGlobal, function() {
@@ -205,6 +247,31 @@ function tomarListaTels(){
    resGlobal.writeHead(200, {'Content-Type': 'text/html'}); 
    resGlobal.write(strLeidoBD);
    resGlobal.end();   
+}
+
+function tomarContacto(){
+  processPost(reqGlobal, resGlobal, function() {
+
+      var strLeidoBD = '';
+       if(fs.existsSync(BD_TXT)){
+          strLeidoBD = fs.readFileSync(BD_TXT, "utf8");
+       }
+
+       var objJSON = JSON.parse(strLeidoBD);
+
+       var objContactoATomar;
+       for(i=0; i<objJSON.contactos.length; i++){
+          if(objJSON.contactos[i].elid === reqGlobal.post.strIDPar){
+              objContactoATomar = objJSON.contactos[i];
+              break;
+          }
+       } 
+
+      resGlobal.writeHead(200, {'Content-Type': 'text/html'}); 
+      resGlobal.write(JSON.stringify(objContactoATomar));
+      resGlobal.end();   
+
+  });
 }
 
 // FIN ********************** AJAX ***********************************
