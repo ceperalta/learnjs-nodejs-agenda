@@ -8,30 +8,60 @@ Teléfono: <input type='text' value='' id='tel'>
 <br/><br/>
 
 <table id='tabla' border=1>
-	<tr><th>acción</th><th>Nombre</th><th>Teléfono</th></tr>
+	
 
 </table>
 
 </center>
 
 <script>
+
+$( document ).ready(function() {
+  $.post('/ajax/tomarListaTels','', 
+	         function(strRespuestaJSON) {
+	         	 var objJSON = JSON.parse(strRespuestaJSON);
+	             $('#tabla').html( armaTablaDesdeJSON(objJSON) );
+	    	}
+        );
+});
+
 function agregar() {
 
 	   var strNombre = $('#nombre').val();
 	   var strTelefono = $('#tel').val();
 	  
        $.post('/ajax/agregar',{nombre:strNombre,tel:strTelefono}, 
-	         function(respuesta) {
-	            $('#tabla').html( respuesta );
+	         function(strRespuestaJSON) {
+	         	var objJSON = JSON.parse(strRespuestaJSON);
+	            $('#tabla').html( armaTablaDesdeJSON(objJSON) );
 	    	}
 	   );
       
 }
 
-function sleep(millis, callback) {
-    setTimeout(function()
-            { callback(); }
-    , millis);
+function eliminar(strID){
+	$.post('/ajax/eliminar',{strIDPar:strID}, 
+	         function(strRespuestaJSON) {
+	         	var objJSON = JSON.parse(strRespuestaJSON);
+	            $('#tabla').html( armaTablaDesdeJSON(objJSON) );
+	    	}
+	   );
+
 }
+
+
+function armaTablaDesdeJSON(objJSON){
+	var strHTML = "<tr><th>acción</th><th>Nombre</th><th>Teléfono</th></tr>";
+ 	for(i=0; i<objJSON.contactos.length; i++){
+    	  strHTML += '<tr>';
+	      strHTML += "<td><a href='javascript:eliminar(\"" + objJSON.contactos[i].elid + "\");'>eliminar</a></td>";
+	      strHTML += "<td>" + objJSON.contactos[i].nombre + "</td>";
+	      strHTML += "<td>" + objJSON.contactos[i].tel + "</td>";
+	      strHTML += '</tr>';
+    }
+
+    return strHTML;
+}
+
 
 </script>

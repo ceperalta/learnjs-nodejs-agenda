@@ -1,7 +1,5 @@
 //********************** CONFIGURACION ****************************************
-var HOST_BD = "localhost";
-var USUARIO_BD = "root";
-var CLAVE_BD = "contra";
+var BD_TXT = "/nodejs/servidor/bd/bd.txt";
 //FIN ********************** CONFIGURACION ****************************************
 
 
@@ -47,6 +45,12 @@ http.createServer(
       if(strPrimeraParteURL == "ajax"){
         if(aPUrl[2]=="agregar"){
           agregar();     
+        }
+        if(aPUrl[2]=="eliminar"){
+          eliminar();     
+        }
+         if(aPUrl[2]=="tomarListaTels"){
+          tomarListaTels();     
         }
       }
                 
@@ -103,46 +107,106 @@ function entregarDatos()
 
 
 // ********************** AJAX ***********************************
+
+function eliminar(){
+    processPost(reqGlobal, resGlobal, function() {
+         var strLeidoBD = fs.readFileSync(BD_TXT, "utf8");
+         var objJSONBD = JSON.parse(strLeidoBD);
+
+         var objNuevo = {};
+         objNuevo.contactos = [];
+
+         for(i=0; i<objJSONBD.contactos.length; i++){
+            if(objJSONBD.contactos[i].elid !==  reqGlobal.post.strIDPar){
+                 var objJSONNuevoContacto = {};
+
+                objJSONNuevoContacto.elid = objJSONBD.contactos[i].elid;
+                objJSONNuevoContacto.nombre = objJSONBD.contactos[i].nombre;
+                objJSONNuevoContacto.tel =  objJSONBD.contactos[i].tel;
+                objNuevo.contactos.push(objJSONNuevoContacto);
+            }
+
+         }
+
+        var strJSON = JSON.stringify(objNuevo);
+
+        fs.writeFile(BD_TXT, strJSON, function(err) {
+            if(err) {
+                  console.log(err);
+              } else {
+                  //console.log("bd.txt actualizado...");
+              }
+        });
+
+
+         resGlobal.writeHead(200, {'Content-Type': 'text/html'});
+         resGlobal.write(strJSON);
+         resGlobal.end();  
+
+
+    });
+}
+
 function agregar()
 { 
- 
-    resGlobal.writeHead(200, {'Content-Type': 'text/html'});
-
+  
     processPost(reqGlobal, resGlobal, function() {
-        //console.log("tel: " + reqGlobal.post.tel);
-
-        var htmlRes = "nombre: " + reqGlobal.post.nombre;
-        htmlRes += "<br>tel: " + reqGlobal.post.tel;
-
+       
         var strIdUnico = Math.floor((1 + Math.random()) * 0x10000).toString(16);
 
-        var strLeidoBD = fs.readFileSync("/nodejs/servidor/bd/bd.txt", "utf8");
-        var objJSONBD = JSON.parse(strLeidoBD);
+        var objJSONBD;
 
-        //var objJSONBD = {};
-        objJSONBD.contacto2 = {};
-        objJSONBD.contacto2.elid = strIdUnico;
-        objJSONBD.contacto2.nombre = reqGlobal.post.nombre;
-        objJSONBD.contacto2.tel = reqGlobal.post.tel;
+        if(fs.existsSync(BD_TXT)){
+            var strLeidoBD = fs.readFileSync(BD_TXT, "utf8");
+            objJSONBD = JSON.parse(strLeidoBD);
+        }
+        else{
+          objJSONBD = {};
+          objJSONBD.contactos = [];
+        }
+        
+        var objJSONNuevoContacto = {};
 
-        console.log(objJSONBD);
+        objJSONNuevoContacto.elid = strIdUnico;
+        objJSONNuevoContacto.nombre = reqGlobal.post.nombre;
+        objJSONNuevoContacto.tel = reqGlobal.post.tel;
+
+        objJSONBD.contactos.push(objJSONNuevoContacto);
 
         var strObjJSONBD = JSON.stringify(objJSONBD);
 
-        fs.writeFile("/nodejs/servidor/bd/bd.txt", strObjJSONBD, function(err) {
+        fs.writeFile(BD_TXT, strObjJSONBD, function(err) {
             if(err) {
                   console.log(err);
               } else {
                   //console.log("bd.txt actualizado...");
               }
         }); 
-    
-        resGlobal.write(htmlRes);
-        resGlobal.end();        
-    });
 
+
+       
+         resGlobal.writeHead(200, {'Content-Type': 'text/html'});
+         resGlobal.write(strObjJSONBD);
+         resGlobal.end();   
+            
+    });
+  
+
+  
+   
               
 }
+
+function tomarListaTels(){
+   var strLeidoBD = '';
+   if(fs.existsSync(BD_TXT)){
+      strLeidoBD = fs.readFileSync(BD_TXT, "utf8");
+   }
+   resGlobal.writeHead(200, {'Content-Type': 'text/html'}); 
+   resGlobal.write(strLeidoBD);
+   resGlobal.end();   
+}
+
 // FIN ********************** AJAX ***********************************
 
 

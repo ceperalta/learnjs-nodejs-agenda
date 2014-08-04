@@ -1,1 +1,1 @@
-{"contacto":{"elid":"1bb4e","nombre":"a","tel":"1"},"contacto2":{"elid":"1d1c0","nombre":"a","tel":"11"}}
+{"contactos":[{"elid":"15018","nombre":"dddd","tel":"5555"},{"elid":"162ab","nombre":"dddd","tel":"5555"},{"elid":"12599","nombre":"dddd","tel":"5555"}]}
